@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """HBNBCommand class module"""
 from cmd import Cmd
+from re import match
 from shlex import split
 from models.base_model import BaseModel
 from models.user import User
@@ -100,6 +101,27 @@ class HBNBCommand(Cmd):
             except Exception:
                 pass
             self.storage.save()
+
+    def do_count(self, arg):
+        """Count instances using:
+        count <class name>"""
+        args = split(arg)
+        if len(args) == 0:
+            print("** class name missing **")
+        else:
+            count = 0
+            for i in self.storage.all().values():
+                if type(i).__name__ == args[0]:
+                    count += 1
+            print(count)
+
+    def default(self, arg):
+        """Called when the command is not recognized"""
+        if match(r"\w+?\.\w+?\(.*?\)", arg):
+            fn = arg.split("(")[0].split(".")[1]
+            cls = arg.split(".")[0]
+            args = arg.split(")")[0].split("(")[1].replace(",", "")
+            Cmd.onecmd(self, f"{fn} {cls} {args}")
 
 
 if __name__ == '__main__':
