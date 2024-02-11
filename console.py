@@ -120,8 +120,15 @@ class HBNBCommand(Cmd):
         if match(r"\w+?\.\w+?\(.*?\)", arg):
             fn = arg.split("(")[0].split(".")[1]
             cls = arg.split(".")[0]
-            args = arg.split(")")[0].split("(")[1].replace(",", "")
-            Cmd.onecmd(self, f"{fn} {cls} {args}")
+            args = arg.split("{")[0].split("(")[1].replace(",", " ").strip(")")
+            if "{" in arg:
+                dict = arg.split("}")[0].split("{")[1].split(",")
+                for i in dict:
+                    attr = i.split(':')[0]
+                    val = i.split(':')[1]
+                    Cmd.onecmd(self, f"{fn} {cls} {args} {attr} {val}")
+            else:
+                Cmd.onecmd(self, f"{fn} {cls} {args}")
 
 
 if __name__ == '__main__':
