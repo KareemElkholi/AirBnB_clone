@@ -207,6 +207,159 @@ class TestHBNBCommand(TestCase):
                                       if type(j).__name__ == i]), count)
 
     def test_default(self):
+        """test default function"""
+
+        """test <class name>.all() with incorrect class name"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("class.all()")
+            err = f.getvalue().strip()
+            self.assertEqual(err, "** class doesn't exist **")
+
+        """test <class name>.all() with correct class name"""
+        for i in self.cls:
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd(f"{i}.all()")
+                objs = f.getvalue().strip()
+                self.assertEqual(str([j.__str__() for j in self.all.values()
+                                      if type(j).__name__ == i]), objs)
+
+        """test <class name>.create() with incorrect class name"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("class.create()")
+            err = f.getvalue().strip()
+            self.assertEqual(err, "** class doesn't exist **")
+
+        """test <class name>.create() with correct class name"""
+        for i in self.cls:
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd(f"{i}.create()")
+                id = f.getvalue().strip()
+                self.assertIn(f"{i}.{id}", self.all.keys())
+
+        """test <class name>.count() with incorrect class name"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("class.count()")
+            err = f.getvalue().strip()
+            self.assertEqual(err, "** class doesn't exist **")
+
+        """test <class name>.count() with correct class name"""
+        for i in self.cls:
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd(f"{i}.count()")
+                count = int(f.getvalue().strip())
+                self.assertEqual(len([j for j in self.all.values()
+                                      if type(j).__name__ == i]), count)
+
+        """test <class name>.show() with incorrect class name"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("class.show()")
+            err = f.getvalue().strip()
+            self.assertEqual(err, "** class doesn't exist **")
+
+        """test <class name>.show() with correct class name"""
+        for i in self.cls:
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd(f"create {i}")
+                id = f.getvalue().strip()
+                f.seek(0)
+                f.truncate(0)
+
+                """with correct id"""
+                HBNBCommand().onecmd(f"{i}.show({id})")
+                obj = f.getvalue().strip()
+                self.assertEqual(obj, str(self.all.get(f"{i}.{id}")))
+                f.seek(0)
+                f.truncate(0)
+
+                """with incorrect id"""
+                HBNBCommand().onecmd(f"{i}.show(id)")
+                err = f.getvalue().strip()
+                self.assertEqual(err, "** no instance found **")
+                f.seek(0)
+                f.truncate(0)
+
+                """without id"""
+                HBNBCommand().onecmd(f"{i}.show()")
+                err = f.getvalue().strip()
+                self.assertEqual(err, "** instance id missing **")
+
+        """test <class name>.destroy() with incorrect class name"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("class.destroy()")
+            err = f.getvalue().strip()
+            self.assertEqual(err, "** class doesn't exist **")
+
+        """test <class name>.destroy() with correct class name"""
+        for i in self.cls:
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd(f"create {i}")
+                id = f.getvalue().strip()
+                f.seek(0)
+                f.truncate(0)
+
+                """with correct id"""
+                self.assertIn(f"{i}.{id}", self.all.keys())
+                HBNBCommand().onecmd(f"{i}.destroy({id})")
+                self.assertNotIn(f"{i}.{id}", self.all.keys())
+
+                """with incorrect id"""
+                HBNBCommand().onecmd(f"{i}.destroy(id)")
+                err = f.getvalue().strip()
+                self.assertEqual(err, "** no instance found **")
+                f.seek(0)
+                f.truncate(0)
+
+                """without id"""
+                HBNBCommand().onecmd(f"{i}.destroy()")
+                err = f.getvalue().strip()
+                self.assertEqual(err, "** instance id missing **")
+
+        """test <class name>.update() with incorrect class name"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("class.update()")
+            err = f.getvalue().strip()
+            self.assertEqual(err, "** class doesn't exist **")
+
+        """test <class name>.update() with correct class name"""
+        for i in self.cls:
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd(f"create {i}")
+                id = f.getvalue().strip()
+                f.seek(0)
+                f.truncate(0)
+
+                """with correct id, attribute and value"""
+                self.assertNotIn("attribute", self.all[f"{i}.{id}"].__dict__)
+                HBNBCommand().onecmd(f"{i}.update({id}, 'attribute', 'value')")
+                self.assertEqual(self.all[f"{i}.{id}"].__dict__["attribute"],
+                                 "value")
+
+                """with correct id and attribute only"""
+                HBNBCommand().onecmd(f"{i}.update({id}, 'attribute')")
+                err = f.getvalue().strip()
+                self.assertEqual(err, "** value missing **")
+                f.seek(0)
+                f.truncate(0)
+
+                """with correct id only"""
+                HBNBCommand().onecmd(f"{i}.update({id})")
+                err = f.getvalue().strip()
+                self.assertEqual(err, "** attribute name missing **")
+                f.seek(0)
+                f.truncate(0)
+
+                """with incorrect id"""
+                HBNBCommand().onecmd(f"{i}.update(id)")
+                err = f.getvalue().strip()
+                self.assertEqual(err, "** no instance found **")
+                f.seek(0)
+                f.truncate(0)
+
+                """without id"""
+                HBNBCommand().onecmd(f"{i}.update()")
+                err = f.getvalue().strip()
+                self.assertEqual(err, "** instance id missing **")
+
         """test update with dict"""
         for i in self.cls:
             with patch('sys.stdout', new=StringIO()) as f:
