@@ -108,6 +108,8 @@ class HBNBCommand(Cmd):
         args = split(arg)
         if len(args) == 0:
             print("** class name missing **")
+        elif args[0] not in self.cls:
+            print("** class doesn't exist **")
         else:
             count = 0
             for i in self.storage.all().values():
