@@ -45,6 +45,71 @@ class TestHBNBCommand(TestCase):
         with patch('sys.stdout', new=StringIO()) as f:
             HBNBCommand().onecmd('')
             self.assertEqual(f.getvalue(), '')
+            f.seek(0)
+            f.truncate(0)
+            HBNBCommand().onecmd('\n')
+            self.assertEqual(f.getvalue(), '')
+
+    def test_help(self):
+        """test help"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("?")
+            str = "Documented commands (type help <topic>)"
+            self.assertIn(str, f.getvalue().strip())
+            f.seek(0)
+            f.truncate(0)
+
+            HBNBCommand().onecmd("help EOF")
+            str = "Quit command to exit the program"
+            self.assertEqual(str, f.getvalue().strip())
+            f.seek(0)
+            f.truncate(0)
+
+            HBNBCommand().onecmd("help all")
+            str = "all <class name>"
+            self.assertIn(str, f.getvalue().strip())
+            f.seek(0)
+            f.truncate(0)
+
+            HBNBCommand().onecmd("help count")
+            str = "count <class name>"
+            self.assertIn(str, f.getvalue().strip())
+            f.seek(0)
+            f.truncate(0)
+
+            HBNBCommand().onecmd("help create")
+            str = "create <class name>"
+            self.assertIn(str, f.getvalue().strip())
+            f.seek(0)
+            f.truncate(0)
+
+            HBNBCommand().onecmd("help destroy")
+            str = "destroy <class name> <id>"
+            self.assertIn(str, f.getvalue().strip())
+            f.seek(0)
+            f.truncate(0)
+
+            HBNBCommand().onecmd("help help")
+            str = 'List available commands with "help"'
+            self.assertIn(str, f.getvalue().strip())
+            f.seek(0)
+            f.truncate(0)
+
+            HBNBCommand().onecmd("help quit")
+            str = "Quit command to exit the program"
+            self.assertEqual(str, f.getvalue().strip())
+            f.seek(0)
+            f.truncate(0)
+
+            HBNBCommand().onecmd("help show")
+            str = "show <class name> <id>"
+            self.assertIn(str, f.getvalue().strip())
+            f.seek(0)
+            f.truncate(0)
+
+            HBNBCommand().onecmd("help update")
+            str = "update <class name> <id> <attribute name> <attribute value>"
+            self.assertIn(str, f.getvalue().strip())
 
     def test_create(self):
         """test create function"""
